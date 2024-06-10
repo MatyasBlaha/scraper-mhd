@@ -1,20 +1,18 @@
-import express from 'express';
-import cors from 'cors';
-import db from './database/database.js'
+const express = require('express');
+const cors = require('cors');
 
 const PORT = 3003;
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+const transportRoutes = require('./src/domains/transport/Routes/transportRoutes.js')
 
-app.get('/api/transport', (req, res) => {
-    const q = 'SELECT * FROM transport_lines';
-    db.query(q, (err, data) => {
-        if(err) console.log(err);
-        res.json(data);
-    })
-})
+app.use('/api/transport', transportRoutes)
+
+
+
+
 
 app.listen(PORT, () => {
     console.log('listening on port: ' + PORT);

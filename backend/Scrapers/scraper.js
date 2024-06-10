@@ -1,13 +1,23 @@
-const request = require('request-promise')
-const cheerio = require('cheerio')
+const request = require('request-promise');
+const cheerio = require('cheerio');
+const mysql = require('mysql2');
+const dotenv = require('dotenv');
 
-const URL = 'https://www.dpmp.cz/cestovani-mhd/vyhledat-spojeni.html?active-tab=timeTables'
+dotenv.config();
+
+const URL = 'https://www.dpmp.cz/cestovani-mhd/vyhledat-spojeni.html?active-tab=timeTables';
+
+const db =  mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Bohemka',
+    database: 'scraper_mhd'
+});
 
 const getData = async () => {
     try {
 
         const response = await request(URL);
-
         let $ = cheerio.load(response);
 
         let busElements = $('a.bus');
@@ -32,22 +42,27 @@ const getData = async () => {
         // Remove duplicates based on number and type
         let uniqueNumbersWithType = Array.from(new Set(numbersWithType.map(JSON.stringify))).map(JSON.parse);
 
-
-
         const insertNumberWithDelay = async (data, delay) => {
             for (let i = 0; i < data.length; i++) {
                 const {number, type} = data[i];
-
-                console.log(`Inserted number: ${number}, type: ${type}`);
+                const q = 'INSERT INTO transport_lines (line_number, type) VALUES(?, ?)';
+                db.query(q, [number, type], (err, result) => {
+                    if (err) {
+                        console.error('Error inserting data:', err);
+                    } else {
+                        console.log(`Inserted number: ${number}, type: ${type}`);
+                    }
+                });
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         };
 
         // Insert numbers with a delay of 1000 milliseconds (1 second)
-        insertNumberWithDelay(uniqueNumbersWithType, 1000);
+        await insertNumberWithDelay(uniqueNumbersWithType, 5000);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
 
 getData();
+

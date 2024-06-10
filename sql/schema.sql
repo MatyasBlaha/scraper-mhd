@@ -1,10 +1,10 @@
-CREATE TABLE bus_lines (
+CREATE TABLE transport_lines (
 	line_id INT PRIMARY KEY AUTO_INCREMENT,
     line_number VARCHAR(10) NOT NULL,
-    line_name VARCHAR(100) NOT NULL
+    `type` VARCHAR(10) NOT NULL
 );
 
-CREATE TABLE bus_stops (
+CREATE TABLE transport_stops (
 	stop_id INT PRIMARY KEY AUTO_INCREMENT,
     stop_name VARCHAR(100) NOT NULL UNIQUE,
     latitude DECIMAL(9, 6) NOT NULL UNIQUE,
@@ -27,7 +27,7 @@ CREATE TABLE routes (
     line_id INT NOT NULL,
     stop_id INT NOT NULL,
 	stop_order INT NOT NULL,
-    route_type VARCHAR(1) NOT NULL, 
+    route_type VARCHAR(1) NOT NULL,
     FOREIGN KEY (line_id) REFERENCES bus_lines(line_id),
     FOREIGN KEY (stop_id) REFERENCES bus_stops(stop_id)
 );
