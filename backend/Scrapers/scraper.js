@@ -5,13 +5,13 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const URL = 'https://www.dpmp.cz/cestovani-mhd/vyhledat-spojeni.html?active-tab=timeTables';
+const URL = process.env.URL;
 
 const db =  mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Bohemka',
-    database: 'scraper_mhd'
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 const getData = async () => {
